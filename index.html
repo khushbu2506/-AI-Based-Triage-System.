@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Hospital Triage & Advisory System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .nav-tab:hover, .nav-tab.active {
+            background: #3498db;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-container {
+            height: 400px;
+            border: 2px solid #ecf0f1;
+            border-radius: 15px;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background: #3498db;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .bot-message {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-field:focus {
+            border-color: #3498db;
+        }
+
+        .btn {
+            padding: 15px 25px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-success {
+            background: #27ae60;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .voice-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .language-selector {
+            padding: 10px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .language-selector:hover {
+            border-color: #3498db;
+        }
+
+        .symptoms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .symptom-card {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .symptom-card:hover {
+            background: #3498db;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .doctor-card {
+            background: #f8f9fa;
+            border: 2px solid #ecf0f1;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .doctor-card:hover {
+            border-color: #3498db;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.1);
+        }
+
+        .appointment-slot {
+            background: #27ae60;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .appointment-slot:hover {
+            background: #229954;
+            transform: scale(1.05);
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .emergency-alert {
+            background: #e74c3c;
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .triage-report {
+            background: #f8f9fa;
+            border: 2px solid #ecf0f1;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .severity-high {
+            border-left: 5px solid #e74c3c;
+        }
+
+        .severity-medium {
+            border-left: 5px solid #f39c12;
+        }
+
+        .severity-low {
+            border-left: 5px solid #27ae60;
+        }
+
+        .hospital-map {
+            height: 300px;
+            background: #ecf0f1;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .prescription-upload {
+            border: 2px dashed #3498db;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .prescription-upload:hover {
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .relax-mode {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .health-tip {
+            background: #e8f5e8;
+            border-left: 4px solid #27ae60;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-tab {
+                width: 200px;
+                text-align: center;
+            }
+            
+            .symptoms-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+<!-- ✅ Firebase SDKs (Auth + Firestore only, no Storage) -->
+<script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDE1DYgZSLLwynydMMseLagh2H4ERYcL40",
+    authDomain: "smarthospital-7d1de.firebaseapp.com",
+    projectId: "smarthospital-7d1de",
+    storageBucket: "smarthospital-7d1de.appspot.com",
+    messagingSenderId: "864114614658",
+    appId: "1:864114614658:web:b55cd14a40cb04fc522f9b",
+    measurementId: "G-TELY3J7J8K"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
+
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-hospital"></i> Smart Hospital Triage</h1>
+            <p>AI-Powered Health Advisory & Triage System</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('patient')">Patient Portal</button>
+            <button class="nav-tab" onclick="showTab('doctor')">Doctor Portal</button>
+            <button class="nav-tab" onclick="showTab('admin')">Admin Dashboard</button>
+            <button class="nav-tab" onclick="showTab('emergency')">Emergency</button>
+        </div>
+
+        <!-- Patient Portal -->
+        <div id="patient" class="tab-content active">
+            <h2><i class="fas fa-user"></i> Patient Portal</h2>
+            
+            <div class="voice-controls">
+                <select class="language-selector" id="languageSelect">
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="gu">Gujarati</option>
+                </select>
+                <button class="btn btn-secondary" onclick="startVoiceInput()">
+                    <i class="fas fa-microphone"></i> Voice Input
+                </button>
+                <button class="btn btn-secondary" onclick="stopVoiceInput()">
+                    <i class="fas fa-stop"></i> Stop Recording
+                </button>
+            </div>
+
+            <div class="chat-container" id="chatContainer">
+                <div class="message bot-message">
+                    <i class="fas fa-robot"></i> Hello! I'm your AI health assistant. Please describe your symptoms or click on common symptoms below.
+                </div>
+            </div>
+
+            <div class="input-group">
+                <input type="text" class="input-field" id="symptomInput" placeholder="Describe your symptoms..." onkeypress="handleKeyPress(event)">
+                <button class="btn" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i> Send
+                </button>
+            </div>
+
+            <div class="symptoms-grid">
+                <div class="symptom-card" onclick="selectSymptom('Headache')">
+                    <i class="fas fa-head-side-virus"></i><br>Headache
+                </div>
+                <div class="symptom-card" onclick="selectSymptom('Fever')">
+                    <i class="fas fa-thermometer-half"></i><br>Fever
+                </div>
+                <div class="symptom-card" onclick="selectSymptom('Cough')">
+                    <i class="fas fa-lungs"></i><br>Cough
+                </div>
+                <div class="symptom-card" onclick="selectSymptom('Stomach Pain')">
+                    <i class="fas fa-stomach"></i><br>Stomach Pain
+                </div>
+                <div class="symptom-card" onclick="selectSymptom('Chest Pain')">
+                    <i class="fas fa-heart"></i><br>Chest Pain
+                </div>
+                <div class="symptom-card" onclick="selectSymptom('Breathing Problem')">
+                    <i class="fas fa-wind"></i><br>Breathing Problem
+                </div>
+            </div>
+
+            <div class="input-group">
+                <button class="btn btn-success" onclick="generateTriageReport()">
+                    <i class="fas fa-file-medical"></i> Generate Triage Report
+                </button>
+                <button class="btn btn-secondary" onclick="findNearbyHospitals()">
+                    <i class="fas fa-map-marker-alt"></i> Find Hospitals
+                </button>
+                <button class="btn btn-secondary" onclick="showRelaxMode()">
+                    <i class="fas fa-spa"></i> Relax Mode
+                </button>
+            </div>
+
+            <div id="triageReport" class="triage-report hidden">
+                <h3><i class="fas fa-clipboard-check"></i> Triage Report</h3>
+                <div id="reportContent"></div>
+                <div class="input-group">
+                    <button class="btn" onclick="downloadReport()">
+                        <i class="fas fa-download"></i> Download PDF
+                    </button>
+                    <button class="btn" onclick="emailReport()">
+                        <i class="fas fa-envelope"></i> Email Report
+                    </button>
+                    <button class="btn" onclick="shareWhatsApp()">
+                        <i class="fab fa-whatsapp"></i> Share on WhatsApp
+                    </button>
+                </div>
+            </div>
+
+            <div class="health-tip">
+                <h4><i class="fas fa-lightbulb"></i> Daily Health Tip</h4>
+                <p id="dailyTip">Stay hydrated! Drink at least 8 glasses of water daily to maintain good health.</p>
+            </div>
+        </div>
+
+        <!-- Doctor Portal -->
+        <div id="doctor" class="tab-content">
+            <h2><i class="fas fa-user-md"></i> Doctor Portal</h2>
+            
+            <div class="input-group">
+                <input type="text" class="input-field" placeholder="Doctor ID" id="doctorId">
+                <input type="password" class="input-field" placeholder="Password" id="doctorPassword">
+                <button class="btn" onclick="doctorLogin()">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </div>
+
+            <div id="doctorDashboard" class="hidden">
+                <h3><i class="fas fa-tachometer-alt"></i> Doctor Dashboard</h3>
+                
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3>12</h3>
+                        <p>Pending Triage Reports</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>5</h3>
+                        <p>Critical Cases</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>28</h3>
+                        <p>Today's Appointments</p>
+                    </div>
+                </div>
+
+                <div class="emergency-alert">
+                    <i class="fas fa-exclamation-triangle"></i> CRITICAL: Patient with chest pain and breathing difficulty - Room 205
+                </div>
+
+                <h4><i class="fas fa-clipboard-list"></i> Recent Triage Reports</h4>
+                <div class="triage-report severity-high">
+                    <strong>Patient: John Doe (25M)</strong><br>
+                    <strong>Symptoms:</strong> Chest pain, shortness of breath, nausea<br>
+                    <strong>AI Assessment:</strong> Possible cardiac event - HIGH PRIORITY<br>
+                    <strong>Department:</strong> Cardiology<br>
+                    <button class="btn btn-danger">Mark as Critical</button>
+                    <button class="btn">View Full Report</button>
+                </div>
+
+                <div class="triage-report severity-medium">
+                    <strong>Patient: Jane Smith (32F)</strong><br>
+                    <strong>Symptoms:</strong> Headache, fever, body aches<br>
+                    <strong>AI Assessment:</strong> Possible viral infection - MEDIUM PRIORITY<br>
+                    <strong>Department:</strong> General Medicine<br>
+                    <button class="btn">Schedule Appointment</button>
+                </div>
+
+                <!-- Prescription Upload Disabled (Storage Removed) -->
+            </div>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div id="admin" class="tab-content">
+            <h2><i class="fas fa-cogs"></i> Admin Dashboard</h2>
+            
+            <div class="input-group">
+                <input type="text" class="input-field" placeholder="Admin Username" id="adminUsername">
+                <input type="password" class="input-field" placeholder="Password" id="adminPassword">
+                <button class="btn" onclick="adminLogin()">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </div>
+
+            <div id="adminPanel" class="hidden">
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3>156</h3>
+                        <p>Total Triages Today</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>23</h3>
+                        <p>Critical Cases</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>89</h3>
+                        <p>Appointments Scheduled</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>45</h3>
+                        <p>Active Doctors</p>
+                    </div>
+                </div>
+
+                <h3><i class="fas fa-chart-bar"></i> Analytics</h3>
+                <div class="triage-report">
+                    <h4>Severity Breakdown</h4>
+                    <p><strong>High Priority:</strong> 23 cases (14.7%)</p>
+                    <p><strong>Medium Priority:</strong> 67 cases (42.9%)</p>
+                    <p><strong>Low Priority:</strong> 66 cases (42.4%)</p>
+                </div>
+
+                <div class="triage-report">
+                    <h4>Department Distribution</h4>
+                    <p><strong>General Medicine:</strong> 45 cases</p>
+                    <p><strong>Cardiology:</strong> 23 cases</p>
+                    <p><strong>ENT:</strong> 18 cases</p>
+                    <p><strong>Orthopedics:</strong> 16 cases</p>
+                    <p><strong>Pediatrics:</strong> 12 cases</p>
+                </div>
+
+                <div class="input-group">
+                    <button class="btn" onclick="addDoctor()">
+                        <i class="fas fa-user-plus"></i> Add Doctor
+                    </button>
+                    <button class="btn" onclick="manageDepartments()">
+                        <i class="fas fa-building"></i> Manage Departments
+                    </button>
+                    <button class="btn" onclick="exportData()">
+                        <i class="fas fa-file-export"></i> Export Data
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emergency -->
+        <div id="emergency" class="tab-content">
+            <h2><i class="fas fa-exclamation-triangle"></i> Emergency First Aid</h2>
+            
+            <div class="emergency-alert">
+                <i class="fas fa-phone"></i> Emergency Hotline: 108 | 102
+            </div>
+
+            <div class="symptoms-grid">
+                <div class="symptom-card" onclick="showFirstAid('Heart Attack')">
+                    <i class="fas fa-heart"></i><br>Heart Attack
+                </div>
+                <div class="symptom-card" onclick="showFirstAid('Choking')">
+                    <i class="fas fa-lungs"></i><br>Choking
+                </div>
+                <div class="symptom-card" onclick="showFirstAid('Bleeding')">
+                    <i class="fas fa-tint"></i><br>Severe Bleeding
+                </div>
+                <div class="symptom-card" onclick="showFirstAid('Burn')">
+                    <i class="fas fa-fire"></i><br>Burns
+                </div>
+                <div class="symptom-card" onclick="showFirstAid('Fracture')">
+                    <i class="fas fa-bone"></i><br>Fracture
+                </div>
+                <div class="symptom-card" onclick="showFirstAid('Poisoning')">
+                    <i class="fas fa-skull-crossbones"></i><br>Poisoning
+                </div>
+            </div>
+
+            <div id="firstAidInstructions" class="triage-report hidden">
+                <h3 id="firstAidTitle"></h3>
+                <div id="firstAidContent"></div>
+            </div>
+
+            <div class="hospital-map">
+                <i class="fas fa-map-marked-alt"></i><br>
+                <h3>Nearby Emergency Hospitals</h3>
+                <p>Loading map...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentTab = 'patient';
+        let isRecording = false;
+        let recognition;
+        let currentLanguage = 'en';
+        let chatHistory = [];
+        let currentSymptoms = [];
+        let triageData = {};
+
+        // Initialize the application
+        function init() {
+            setupSpeechRecognition();
+            loadDailyTip();
+            updateDateTime();
+            setInterval(updateDateTime, 60000);
+        }
+
+        // Tab switching
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            currentTab = tabName;
+        }
+
+        // Speech recognition setup
+        function setupSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window) {
+                recognition = new webkitSpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = false;
+                recognition.lang = currentLanguage + '-IN';
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[event.results.length - 1][0].transcript;
+                    document.getElementById('symptomInput').value = transcript;
+                    processSymptoms(transcript);
+                };
+                
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error:', event.error);
+                    alert('Voice recognition error. Please try again.');
+                };
+            }
+        }
+
+        // Voice input controls
+        function startVoiceInput() {
+            if (recognition && !isRecording) {
+                currentLanguage = document.getElementById('languageSelect').value;
+                recognition.lang = currentLanguage + '-IN';
+                recognition.start();
+                isRecording = true;
+                
+                // Visual feedback
+                document.querySelector('[onclick="startVoiceInput()"]').innerHTML = 
+                    '<i class="fas fa-microphone"></i> <span class="loading"></span> Listening...';
+            }
+        }
+
+        function stopVoiceInput() {
+            if (recognition && isRecording) {
+                recognition.stop();
+                isRecording = false;
+                document.querySelector('[onclick="startVoiceInput()"]').innerHTML = 
+                    '<i class="fas fa-microphone"></i> Voice Input';
+            }
+        }
+
+        // Message handling
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('symptomInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                addMessageToChat(message, 'user');
+                processSymptoms(message);
+                input.value = '';
+            }
+        }
+
+        function addMessageToChat(message, sender) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            
+            if (sender === 'bot') {
+                messageDiv.innerHTML = `<i class="fas fa-robot"></i> ${message}`;
+            } else {
+                messageDiv.innerHTML = `<i class="fas fa-user"></i> ${message}`;
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            chatHistory.push({sender, message, timestamp: new Date()});
+        }
+
+        // AI symptom processing
+        function processSymptoms(symptoms) {
+            currentSymptoms.push(symptoms);
+            
+            // Simple AI logic for demonstration
+            const response = generateAIResponse(symptoms);
+            
+            setTimeout(() => {
+                addMessageToChat(response, 'bot');
+            }, 1000);
+        }
+
+
+async function fetchTogetherAIResponse(message) {
+    try {
+        const response = await fetch('/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message })
+        });
+
+        const data = await response.json();
+        return data.reply;
+    } catch (error) {
+        console.error('Error fetching Together.ai response:', error);
+        return "Sorry, I'm having trouble responding right now.";
+    }
+}
+
+async function processSymptoms(symptoms) {
+    currentSymptoms.push(symptoms);
+    const response = await fetchTogetherAIResponse(symptoms);
+    addMessageToChat(response, 'bot');
+}
+
+
+        // Symptom selection
+        function selectSymptom(symptom) {
+            document.getElementById('symptomInput').value = symptom;
+            processSymptoms(symptom);
+        }
+
+        // Triage report generation
+        function generateTriageReport() {
+            if (currentSymptoms.length === 0) {
+                alert('Please describe your symptoms first.');
+                return;
+            }
+            
+            const reportData = {
+                patientId: 'P' + Date.now(),
+                symptoms: currentSymptoms,
+                timestamp: new Date(),
+                severity: calculateSeverity(currentSymptoms),
+                recommendedDepartment: getRecommendedDepartment(currentSymptoms),
+                aiAssessment: getAIAssessment(currentSymptoms)
+            };
+            
+            triageData = reportData;
+            displayTriageReport(reportData);
+        }
+
+        function calculateSeverity(symptoms) {
+            const criticalKeywords = ['chest pain', 'heart attack', 'breathing', 'severe bleeding', 'unconscious'];
+            const mediumKeywords = ['fever', 'severe headache', 'vomiting', 'abdominal pain'];
+            
+            const allSymptoms = symptoms.join(' ').toLowerCase();
+            
+            if (criticalKeywords.some(keyword => allSymptoms.includes(keyword))) {
+                return 'high';
+            } else if (mediumKeywords.some(keyword => allSymptoms.includes(keyword))) {
+                return 'medium';
+            } else {
+                return 'low';
+            }
+        }
+
+        function getRecommendedDepartment(symptoms) {
+            const allSymptoms = symptoms.join(' ').toLowerCase();
+            
+            if (allSymptoms.includes('chest pain') || allSymptoms.includes('heart')) {
+                return 'Cardiology';
+            } else if (allSymptoms.includes('throat') || allSymptoms.includes('ear') || allSymptoms.includes('nose')) {
+                return 'ENT';
+            } else if (allSymptoms.includes('bone') || allSymptoms.includes('joint') || allSymptoms.includes('fracture')) {
+                return 'Orthopedics';
+            } else if (allSymptoms.includes('skin') || allSymptoms.includes('rash')) {
+                return 'Dermatology';
+            } else if (allSymptoms.includes('eye') || allSymptoms.includes('vision')) {
+                return 'Ophthalmology';
+            } else {
+                return 'General Medicine';
+            }
+        }
+
+        function getAIAssessment(symptoms) {
+            const allSymptoms = symptoms.join(' ').toLowerCase();
+            
+            if (allSymptoms.includes('chest pain')) {
+                return 'Possible cardiac event or chest wall pain. Immediate medical evaluation recommended.';
+            } else if (allSymptoms.includes('fever') && allSymptoms.includes('cough')) {
+                return 'Possible respiratory infection. Monitor temperature and seek medical care if symptoms worsen.';
+            } else if (allSymptoms.includes('headache') && allSymptoms.includes('fever')) {
+                return 'Possible viral infection or other systemic condition. Medical evaluation recommended.';
+            } else {
+                return 'Symptoms require medical evaluation for proper diagnosis and treatment.';
+            }
+        }
+
+        function displayTriageReport(data) {
+            const reportDiv = document.getElementById('triageReport');
+            const contentDiv = document.getElementById('reportContent');
+            
+            const severityClass = `severity-${data.severity}`;
+            reportDiv.className = `triage-report ${severityClass}`;
+            
+            contentDiv.innerHTML = `
+                <p><strong>Patient ID:</strong> ${data.patientId}</p>
+                <p><strong>Date & Time:</strong> ${data.timestamp.toLocaleString()}</p>
+                <p><strong>Reported Symptoms:</strong> ${data.symptoms.join(', ')}</p>
+                <p><strong>Severity Level:</strong> ${data.severity.toUpperCase()}</p>
+                <p><strong>Recommended Department:</strong> ${data.recommendedDepartment}</p>
+                <p><strong>AI Assessment:</strong> ${data.aiAssessment}</p>
+                <p><strong>Estimated Wait Time:</strong> ${getEstimatedWaitTime(data.severity)}</p>
+            `;
+            
+            reportDiv.classList.remove('hidden');
+        }
+
+        function getEstimatedWaitTime(severity) {
+            switch(severity) {
+                case 'high': return 'Immediate attention required';
+                case 'medium': return '15-30 minutes';
+                case 'low': return '45-60 minutes';
+                default: return 'Please contact hospital for wait time';
+            }
+        }
+
+        // Report sharing functions
+        function downloadReport() {
+            if (!triageData.patientId) {
+                alert('Please generate a triage report first.');
+                return;
+            }
+            
+            const reportContent = `
+SMART HOSPITAL TRIAGE REPORT
+==============================
+
+Patient ID: ${triageData.patientId}
+Date & Time: ${triageData.timestamp.toLocaleString()}
+Reported Symptoms: ${triageData.symptoms.join(', ')}
+Severity Level: ${triageData.severity.toUpperCase()}
+Recommended Department: ${triageData.recommendedDepartment}
+AI Assessment: ${triageData.aiAssessment}
+Estimated Wait Time: ${getEstimatedWaitTime(triageData.severity)}
+
+DISCLAIMER: This is an AI-generated preliminary assessment. Please consult with a healthcare professional for proper diagnosis and treatment.
+            `;
+            
+            const blob = new Blob([reportContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `triage_report_${triageData.patientId}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function emailReport() {
+            if (!triageData.patientId) {
+                alert('Please generate a triage report first.');
+                return;
+            }
+            
+            const subject = `Triage Report - ${triageData.patientId}`;
+            const body = `Please find your triage report attached. Patient ID: ${triageData.patientId}, Severity: ${triageData.severity.toUpperCase()}`;
+            
+            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+
+        function shareWhatsApp() {
+            if (!triageData.patientId) {
+                alert('Please generate a triage report first.');
+                return;
+            }
+            
+            const message = `Triage Report - ${triageData.patientId}\nSymptoms: ${triageData.symptoms.join(', ')}\nSeverity: ${triageData.severity.toUpperCase()}\nDepartment: ${triageData.recommendedDepartment}`;
+            
+            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        // Hospital finder
+        function findNearbyHospitals() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        
+                        // Simulate finding nearby hospitals
+                        const hospitals = [
+                            { name: 'City General Hospital', distance: '1.2 km', phone: '+91-123-456-7890' },
+                            { name: 'Apollo Hospital', distance: '2.5 km', phone: '+91-123-456-7891' },
+                            { name: 'Max Healthcare', distance: '3.1 km', phone: '+91-123-456-7892' },
+                            { name: 'Fortis Hospital', distance: '4.0 km', phone: '+91-123-456-7893' }
+                        ];
+                        
+                        showHospitalList(hospitals);
+                    },
+                    (error) => {
+                        alert('Unable to get your location. Please enable location services.');
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        }
+
+        function showHospitalList(hospitals) {
+            const hospitalListHTML = hospitals.map(hospital => `
+                <div class="doctor-card">
+                    <h4><i class="fas fa-hospital"></i> ${hospital.name}</h4>
+                    <p><i class="fas fa-map-marker-alt"></i> Distance: ${hospital.distance}</p>
+                    <p><i class="fas fa-phone"></i> ${hospital.phone}</p>
+                    <button class="btn" onclick="bookAppointment('${hospital.name}')">
+                        <i class="fas fa-calendar-plus"></i> Book Appointment
+                    </button>
+                    <button class="btn btn-secondary" onclick="getDirections('${hospital.name}')">
+                        <i class="fas fa-directions"></i> Get Directions
+                    </button>
+                </div>
+            `).join('');
+            
+            addMessageToChat(`Found ${hospitals.length} nearby hospitals:`, 'bot');
+            
+            // Create a temporary div to show hospitals
+            const hospitalDiv = document.createElement('div');
+            hospitalDiv.innerHTML = hospitalListHTML;
+            hospitalDiv.style.marginTop = '20px';
+            document.getElementById('chatContainer').appendChild(hospitalDiv);
+        }
+
+        function bookAppointment(hospitalName) {
+            const doctors = [
+                { name: 'Dr. Amit Sharma', specialty: 'Cardiologist', slots: ['10:00 AM', '2:00 PM', '4:00 PM'] },
+                { name: 'Dr. Priya Patel', specialty: 'General Medicine', slots: ['9:00 AM', '11:00 AM', '3:00 PM'] },
+                { name: 'Dr. Raj Kumar', specialty: 'ENT Specialist', slots: ['10:30 AM', '1:30 PM', '5:00 PM'] }
+            ];
+            
+            showDoctorAppointments(doctors, hospitalName);
+        }
+
+        function showDoctorAppointments(doctors, hospitalName) {
+            const appointmentHTML = `
+                <div class="triage-report">
+                    <h3><i class="fas fa-calendar-alt"></i> Available Appointments at ${hospitalName}</h3>
+                    ${doctors.map(doctor => `
+                        <div class="doctor-card">
+                            <h4>${doctor.name}</h4>
+                            <p><i class="fas fa-stethoscope"></i> ${doctor.specialty}</p>
+                            <p><strong>Available Slots:</strong></p>
+                            ${doctor.slots.map(slot => `
+                                <span class="appointment-slot" onclick="confirmAppointment('${doctor.name}', '${slot}')">
+                                    ${slot}
+                                </span>
+                            `).join('')}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            document.getElementById('chatContainer').innerHTML += appointmentHTML;
+        }
+
+        function confirmAppointment(doctorName, slot) {
+            const confirmation = confirm(`Book appointment with ${doctorName} at ${slot}?`);
+            if (confirmation) {
+                addMessageToChat(`Appointment booked with ${doctorName} at ${slot}. You will receive a confirmation SMS shortly.`, 'bot');
+            }
+        }
+
+        function getDirections(hospitalName) {
+            // Open Google Maps with directions
+            window.open(`https://www.google.com/maps/search/${encodeURIComponent(hospitalName + ' hospital near me')}`, '_blank');
+        }
+
+        // Relax mode
+        function showRelaxMode() {
+            const relaxContent = `
+                <div class="relax-mode">
+                    <h3><i class="fas fa-spa"></i> Relax Mode</h3>
+                    <p>Take deep breaths and relax while waiting for your appointment.</p>
+                    <button class="btn" onclick="playBreathingExercise()">
+                        <i class="fas fa-wind"></i> Breathing Exercise
+                    </button>
+                    <button class="btn" onclick="playRelaxingMusic()">
+                        <i class="fas fa-music"></i> Relaxing Music
+                    </button>
+                    <button class="btn" onclick="showHealthTips()">
+                        <i class="fas fa-lightbulb"></i> Health Tips
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('chatContainer').innerHTML += relaxContent;
+        }
+
+        function playBreathingExercise() {
+            addMessageToChat('Starting breathing exercise: Breathe in for 4 seconds, hold for 4 seconds, breathe out for 4 seconds. Repeat 5 times.', 'bot');
+        }
+
+        function playRelaxingMusic() {
+            addMessageToChat('🎵 Playing relaxing music... Close your eyes and focus on your breathing.', 'bot');
+        }
+
+        function showHealthTips() {
+            const tips = [
+                'Stay hydrated by drinking plenty of water throughout the day.',
+                'Get at least 7-8 hours of sleep each night for optimal health.',
+                'Exercise regularly - even 30 minutes of walking can make a difference.',
+                'Eat a balanced diet with plenty of fruits and vegetables.',
+                'Practice stress management techniques like meditation or yoga.'
+            ];
+            
+            const randomTip = tips[Math.floor(Math.random() * tips.length)];
+            addMessageToChat(`💡 Health Tip: ${randomTip}`, 'bot');
+        }
+
+        function doctorLogin() {
+    const email = document.getElementById('doctorId').value;
+    const password = document.getElementById('doctorPassword').value;
+
+    firebase.auth().signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            document.getElementById('doctorDashboard').classList.remove('hidden');
+            addMessageToChat(`Doctor login successful. Welcome, ${email}`, 'bot');
+        })
+        .catch((error) => {
+            alert('Invalid credentials. Please try again.');
+        });
+}
+
+        // Admin portal functions
+        function adminLogin() {
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            if (username === 'admin' && password === 'admin123') {
+                document.getElementById('adminPanel').classList.remove('hidden');
+            } else {
+                alert('Invalid admin credentials.');
+            }
+        }
+
+        function addDoctor() {
+            const doctorName = prompt('Enter doctor name:');
+            const specialty = prompt('Enter specialty:');
+            
+            if (doctorName && specialty) {
+                alert(`Doctor ${doctorName} (${specialty}) added successfully!`);
+            }
+        }
+
+        function manageDepartments() {
+            alert('Department management feature - Add/edit hospital departments');
+        }
+
+        function exportData() {
+            const data = {
+                totalTriages: 156,
+                criticalCases: 23,
+                appointments: 89,
+                activeDoctors: 45,
+                timestamp: new Date()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hospital_data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Emergency first aid
+        function showFirstAid(condition) {
+            const firstAidGuides = {
+                'Heart Attack': {
+                    title: 'Heart Attack First Aid',
+                    content: `
+                        <h4>🚨 CALL 108 IMMEDIATELY!</h4>
+                        <ol>
+                            <li>Call emergency services right away</li>
+                            <li>Keep the person calm and seated</li>
+                            <li>Loosen any tight clothing</li>
+                            <li>If conscious, give aspirin if available and not allergic</li>
+                            <li>Be prepared to perform CPR if person becomes unconscious</li>
+                            <li>Do not leave the person alone</li>
+                        </ol>
+                        <p><strong>Warning Signs:</strong> Chest pain, shortness of breath, sweating, nausea</p>
+                    `
+                },
+                'Choking': {
+                    title: 'Choking First Aid',
+                    content: `
+                        <h4>For Adults:</h4>
+                        <ol>
+                            <li>Encourage coughing if person is conscious</li>
+                            <li>Stand behind the person</li>
+                            <li>Place hands above navel, below ribcage</li>
+                            <li>Give 5 quick upward thrusts</li>
+                            <li>Continue until object is expelled</li>
+                            <li>Call 108 if unsuccessful</li>
+                        </ol>
+                        <p><strong>For infants:</strong> Use back blows and chest thrusts</p>
+                    `
+                },
+                'Bleeding': {
+                    title: 'Severe Bleeding First Aid',
+                    content: `
+                        <ol>
+                            <li>Call 108 for severe bleeding</li>
+                            <li>Apply direct pressure with clean cloth</li>
+                            <li>Do not remove embedded objects</li>
+                            <li>Elevate the injured area above heart level</li>
+                            <li>Apply pressure to pressure points if needed</li>
+                            <li>Keep person warm to prevent shock</li>
+                            <li>Monitor breathing and consciousness</li>
+                        </ol>
+                    `
+                },
+                'Burn': {
+                    title: 'Burn First Aid',
+                    content: `
+                        <ol>
+                            <li>Remove from heat source if safe</li>
+                            <li>Cool with running water for 10-15 minutes</li>
+                            <li>Remove jewelry/tight clothing before swelling</li>
+                            <li>Cover with clean, dry cloth</li>
+                            <li>Do not apply ice or butter</li>
+                            <li>Seek medical attention for severe burns</li>
+                            <li>Call 108 for burns larger than palm size</li>
+                        </ol>
+                    `
+                },
+                'Fracture': {
+                    title: 'Fracture First Aid',
+                    content: `
+                        <ol>
+                            <li>Do not move the injured person unless necessary</li>
+                            <li>Immobilize the injured area</li>
+                            <li>Apply ice wrapped in cloth to reduce swelling</li>
+                            <li>Control bleeding if present</li>
+                            <li>Watch for signs of shock</li>
+                            <li>Call 108 for compound fractures</li>
+                            <li>Do not try to realign bones</li>
+                        </ol>
+                    `
+                },
+                'Poisoning': {
+                    title: 'Poisoning First Aid',
+                    content: `
+                        <h4>🚨 CALL 108 AND POISON CONTROL IMMEDIATELY!</h4>
+                        <ol>
+                            <li>Call Poison Control: 1-800-222-1222</li>
+                            <li>Keep poison container with you</li>
+                            <li>Do not induce vomiting unless instructed</li>
+                            <li>If on skin: Remove contaminated clothing, rinse with water</li>
+                            <li>If inhaled: Get to fresh air immediately</li>
+                            <li>If in eyes: Rinse with water for 15 minutes</li>
+                            <li>Keep person calm and monitor breathing</li>
+                        </ol>
+                    `
+                }
+            };
+            
+            const guide = firstAidGuides[condition];
+            if (guide) {
+                document.getElementById('firstAidTitle').textContent = guide.title;
+                document.getElementById('firstAidContent').innerHTML = guide.content;
+                document.getElementById('firstAidInstructions').classList.remove('hidden');
+            }
+        }
+
+        // Utility functions
+        function updateDateTime() {
+            const now = new Date();
+            const dateTime = now.toLocaleString();
+            
+            // Update any datetime displays
+            document.querySelectorAll('.datetime').forEach(el => {
+                el.textContent = dateTime;
+            });
+        }
+
+        function loadDailyTip() {
+            const tips = [
+                'Stay hydrated! Drink at least 8 glasses of water daily.',
+                'Get 7-8 hours of sleep each night for better health.',
+                'Exercise for 30 minutes daily to boost your immune system.',
+                'Eat colorful fruits and vegetables for essential nutrients.',
+                'Practice deep breathing to reduce stress and anxiety.',
+                'Wash your hands frequently to prevent infections.',
+                'Take regular breaks from screen time to rest your eyes.',
+                'Maintain good posture to prevent back and neck pain.'
+            ];
+            
+            const randomTip = tips[Math.floor(Math.random() * tips.length)];
+            document.getElementById('dailyTip').textContent = randomTip;
+        }
+
+        // Initialize the application when page loads
+        window.onload = function() {
+            init();
+        };
+
+        // Backend simulation functions
+        const mockDatabase = {
+            patients: [],
+            doctors: [
+                { id: 'doc123', name: 'Dr. Amit Sharma', specialty: 'Cardiology', available: true },
+                { id: 'doc124', name: 'Dr. Priya Patel', specialty: 'General Medicine', available: true },
+                { id: 'doc125', name: 'Dr. Raj Kumar', specialty: 'ENT', available: false }
+            ],
+            appointments: [],
+            triageReports: []
+        };
+
+        function saveTriageReport(data) {
+            mockDatabase.triageReports.push(data);
+            console.log('Triage report saved:', data);
+        }
+
+        function getDoctorsBySpecialty(specialty) {
+            return mockDatabase.doctors.filter(doc => 
+                doc.specialty === specialty && doc.available
+            );
+        }
+
+        function scheduleAppointment(doctorId, patientId, slot) {
+            const appointment = {
+                id: 'apt_' + Date.now(),
+                doctorId,
+                patientId,
+                slot,
+                status: 'scheduled',
+                createdAt: new Date()
+            };
+            
+            mockDatabase.appointments.push(appointment);
+            return appointment;
+        }
+
+        // WebRTC for video consultation (placeholder)
+        function startVideoConsultation(doctorId) {
+            alert('Video consultation feature would be implemented here using WebRTC');
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #3498db;
+                color: white;
+                padding: 15px;
+                border-radius: 5px;
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            if (type === 'error') {
+                notification.style.background = '#e74c3c';
+            } else if (type === 'success') {
+                notification.style.background = '#27ae60';
+            }
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Medicine reminder system
+        function setMedicineReminder() {
+            const medicineName = prompt('Enter medicine name:');
+            const time = prompt('Enter reminder time (HH:MM):');
+            
+            if (medicineName && time) {
+                showNotification(`Medicine reminder set for ${medicineName} at ${time}`, 'success');
+                
+                // In a real app, this would use background services
+                setTimeout(() => {
+                    showNotification(`Time to take your medicine: ${medicineName}`, 'info');
+                }, 5000); // Demo: 5 seconds
+            }
+        }
+
+        // Wellness quiz
+        function startWellnessQuiz() {
+            const questions = [
+                'Do you exercise regularly?',
+                'Do you eat a balanced diet?',
+                'Do you get enough sleep?',
+                'Do you manage stress well?',
+                'Do you avoid smoking and excessive alcohol?'
+            ];
+            
+            let score = 0;
+            questions.forEach(question => {
+                if (confirm(question)) {
+                    score++;
+                }
+            });
+            
+            const percentage = (score / questions.length) * 100;
+            let result;
+            
+            if (percentage >= 80) {
+                result = 'Excellent! You maintain great health habits.';
+            } else if (percentage >= 60) {
+                result = 'Good! There are some areas for improvement.';
+            } else {
+                result = 'Consider making healthier lifestyle choices.';
+            }
+            
+            addMessageToChat(`Wellness Score: ${percentage}% - ${result}`, 'bot');
+        }
+
+        // Add wellness quiz button to patient portal
+        document.addEventListener('DOMContentLoaded', function() {
+            const patientTab = document.getElementById('patient');
+            if (patientTab) {
+                const quizButton = document.createElement('button');
+                quizButton.className = 'btn btn-secondary';
+                quizButton.innerHTML = '<i class="fas fa-clipboard-check"></i> Wellness Quiz';
+                quizButton.onclick = startWellnessQuiz;
+                
+                const inputGroup = patientTab.querySelector('.input-group');
+                if (inputGroup) {
+                    inputGroup.appendChild(quizButton);
+                }
+            }
+        });
+    </script>
+
+<!-- Admin Portal (No Firebase Auth) -->
+<div id="admin" class="tab-content hidden">
+    <h2><i class="fas fa-user-shield"></i> Admin Portal</h2>
+
+    <div class="input-group">
+        <input type="text" class="input-field" placeholder="Admin Email" id="adminEmail">
+        <input type="password" class="input-field" placeholder="Password" id="adminPassword">
+        <button class="btn" onclick="demoAdminLogin()">
+            <i class="fas fa-sign-in-alt"></i> Login
+        </button>
+    </div>
+
+    <div id="adminDashboard" class="hidden">
+        <h3><i class="fas fa-tools"></i> Admin Dashboard (Demo Mode)</h3>
+
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <h3 id="adminTotalReports">--</h3>
+                <p>Total Triage Reports</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="adminCriticalReports">--</h3>
+                <p>Critical Reports</p>
+            </div>
+        </div>
+
+        <h4><i class="fas fa-clipboard-list"></i> All Triage Reports</h4>
+        <div id="allReports"></div>
+    </div>
+</div>
+
+</body>
+
+<script>
+function demoAdminLogin() {
+    const email = document.getElementById('adminEmail').value;
+    const password = document.getElementById('adminPassword').value;
+
+    if (email === "admin@gmail.com" && password === "admin123") {
+        document.getElementById("adminDashboard").classList.remove("hidden");
+        loadAdminDemoData();
+    } else {
+        alert("Invalid demo credentials");
+    }
+}
+
+function loadAdminDemoData() {
+    db.collection("triageReports").get().then(snapshot => {
+        const total = snapshot.size;
+        let critical = 0;
+        let html = '';
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.assessment && data.assessment.includes("HIGH")) critical++;
+            html += `<div class="triage-report">
+                <strong>${data.name || "Unknown"} (${data.age || "-"})</strong><br>
+                <strong>Symptoms:</strong> ${data.symptoms || "-"}<br>
+                <strong>Assessment:</strong> ${data.assessment || "-"}<br>
+                <strong>Department:</strong> ${data.department || "-"}
+            </div>`;
+        });
+        document.getElementById("adminTotalReports").textContent = total;
+        document.getElementById("adminCriticalReports").textContent = critical;
+        document.getElementById("allReports").innerHTML = html;
+    });
+}
+</script>
+
+</html>
